@@ -1,0 +1,88 @@
+services:
+  krakend:
+    container_name: krakend
+    build:
+      context: ./API_gateway
+      dockerfile: Dockerfile
+    ports:
+      - "8080:8080"
+    networks:
+      - private-network
+      - public-network
+
+  ai:
+    container_name: ai
+    build:
+      context: ./Microservices/ai
+      dockerfile: Dockerfile
+    ports:
+      - "5000:5000"
+    networks:
+      - private-network
+      - public-network
+
+  postgres:
+    container_name: postgres
+    build:
+      context: ./database
+      dockerfile: Dockerfile
+    ports:
+      - "5432:5432"
+    networks:
+      - private-network
+      - public-network
+
+  workout:
+    container_name: workout
+    depends_on:
+      - postgres
+    ports:
+      - "8080"
+    build: 
+      context: ./Microservices/workout
+      dockerfile: Dockerfile
+    networks:
+      - private-network
+  
+  user:
+    container_name: user
+    depends_on:
+      - postgres
+    ports:
+      - "8080"
+    build: 
+      context: ./Microservices/user
+      dockerfile: Dockerfile
+    networks:
+      - private-network
+      
+  leaderboard:
+    container_name: leaderboard
+    depends_on:
+      - postgres
+    ports:
+      - "8080"
+    build: 
+      context: ./Microservices/leaderboard
+      dockerfile: Dockerfile
+    networks:
+      - private-network
+
+  family:
+    container_name: family
+    depends_on:
+      - postgres
+    ports:
+      - "8080"
+    build: 
+      context: ./Microservices/family
+      dockerfile: Dockerfile
+    networks:
+      - private-network
+
+networks:
+  private-network:
+    driver: bridge
+    internal: true
+  public-network:
+    driver: bridge
